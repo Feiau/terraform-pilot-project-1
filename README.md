@@ -37,7 +37,7 @@ This project deploys a serverless "Hello World" application using AWS Lambda and
 ### Directory Layout
 
 ```
-pilot-terraform-project/
+terraform-pilot-project-1/
 ├── .github/workflows/       # CI/CD pipeline definitions
 │   ├── deploy-dev.yml       # Dev deployment (push to main)
 │   ├── deploy-prod.yml      # Prod deployment (git tag)
@@ -70,7 +70,7 @@ pilot-terraform-project/
 |----------|-----------|
 | **Modular design** | `modules/lambda-api` is reusable across environments, reducing code duplication |
 | **Separate root modules per env** | Each environment has its own state file, preventing blast radius across environments |
-| **S3 backend with native lock** | Terraform 1.10+ supports `use_lockfile = true` — no DynamoDB needed |
+| **S3 backend with native lock** | Terraform 1.15+ supports `use_lockfile = true` — no DynamoDB needed |
 | **AWS Provider ~> 5.0** | Latest stable major version with broad feature support |
 | **Python 3.12 Lambda** | Simple, no build step required, fast cold starts |
 | **HTTP API Gateway (v2)** | Lower cost and latency than REST API for simple use cases |
@@ -81,8 +81,8 @@ Environments are **fully isolated** through:
 
 1. **Separate Terraform state files** — Each environment uses a different S3 key (`dev/terraform.tfstate` vs `prod/terraform.tfstate`)
 2. **Separate AWS IAM roles** — CI/CD uses different OIDC roles per environment (`AWS_ROLE_ARN_DEV` vs `AWS_ROLE_ARN_PROD`)
-3. **Resource naming** — All resources include the environment name (e.g., `pilot-hello-world-dev`)
-4. **GitHub Environments** — Prod requires manual approval via GitHub environment protection rules
+3. **Resource naming** — All resources include the environment name (e.g., `feitenga01-pilot-hello-world-dev`)
+4. **GitHub Environments** — Prod uses a separate GitHub environment with tag-based trigger isolation
 5. **Different triggers** — Dev deploys on push to main; Prod deploys only on version tags
 
 ## CI/CD Workflow Design
@@ -93,7 +93,7 @@ Environments are **fully isolated** through:
 |----------|---------|---------|
 | `terraform-validate.yml` | PR (*.tf changes) | Format check + validate |
 | `deploy-dev.yml` | Push to main / PR | Plan on PR, Apply on merge |
-| `deploy-prod.yml` | Git tag `v*` | Plan + Apply with manual approval |
+| `deploy-prod.yml` | Git tag `v*` | Plan + Apply (tag-gated) |
 
 ### Pipeline Flow
 
@@ -104,7 +104,7 @@ PR Created ──► terraform-validate (fmt + validate)
 PR Merged to main ──► deploy-dev / terraform-apply (auto-deploys to dev)
 
 Git Tag v1.0.0 ──► deploy-prod / terraform-plan
-               ──► [Manual Approval] ──► deploy-prod / terraform-apply
+               ──► deploy-prod / terraform-apply
 ```
 
 ### Security
@@ -112,7 +112,7 @@ Git Tag v1.0.0 ──► deploy-prod / terraform-plan
 - **OIDC authentication** — No long-lived AWS credentials stored in GitHub
 - **Least privilege** — Separate roles per environment
 - **Plan artifacts** — Reviewable before apply
-- **Environment protection** — Manual approval gate for production
+- **Tag-gated production** — Only explicit version tags trigger prod deployment
 
 ## Deployment Instructions
 
@@ -120,7 +120,7 @@ Git Tag v1.0.0 ──► deploy-prod / terraform-plan
 
 - AWS Account with appropriate permissions
 - GitHub repository
-- Terraform >= 1.10.0 (for local development; 1.10.7 used in CI)
+- Terraform ~> 1.15 (1.15.7 used in CI)
 - AWS CLI configured locally
 
 ### Step 1: Bootstrap State Backend
@@ -153,7 +153,7 @@ Add the following secrets to your GitHub repository:
 
 Create two GitHub Environments:
 - `dev` — No protection rules
-- `prod` — Enable "Required reviewers" protection rule
+- `prod` — Enable "Required reviewers" protection rule (requires GitHub Pro/Team plan; optional)
 
 ### Step 4: Deploy
 
