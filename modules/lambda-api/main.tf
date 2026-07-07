@@ -1,9 +1,9 @@
 resource "aws_lambda_function" "app" {
-  function_name = "${var.project_name}-${var.environment}"
-  runtime       = "python3.12"
-  handler       = "lambda_function.handler"
-  role          = aws_iam_role.lambda_exec.arn
-  filename      = var.lambda_zip_path
+  function_name    = "${var.project_name}-${var.environment}"
+  runtime          = "python3.12"
+  handler          = "lambda_function.handler"
+  role             = aws_iam_role.lambda_exec.arn
+  filename         = var.lambda_zip_path
   source_code_hash = filebase64sha256(var.lambda_zip_path)
 
   environment {

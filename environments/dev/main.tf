@@ -26,6 +26,7 @@ provider "aws" {
       Environment = "dev"
       Owner       = "feitenga01"
       ManagedBy   = "terraform"
+      auto-delete = "no"
     }
   }
 }
