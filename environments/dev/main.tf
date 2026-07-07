@@ -41,5 +41,6 @@ module "lambda_api" {
     Project     = var.project_name
     Environment = "dev"
     Owner       = "feitenga01"
+    auto-delete = "no"
   }
 }

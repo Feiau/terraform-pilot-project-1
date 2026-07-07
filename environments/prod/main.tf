@@ -26,6 +26,7 @@ provider "aws" {
       Environment = "prod"
       Owner       = "feitenga01"
       ManagedBy   = "terraform"
+      auto-delete = "no"
     }
   }
 }
@@ -41,5 +42,6 @@ module "lambda_api" {
     Project     = var.project_name
     Environment = "prod"
     Owner       = "feitenga01"
+    auto-delete = "no"
   }
 }
