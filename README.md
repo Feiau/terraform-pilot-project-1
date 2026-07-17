@@ -71,7 +71,7 @@ terraform-pilot-project-1/
 | **Modular design** | `modules/lambda-api` is reusable across environments, reducing code duplication |
 | **Separate root modules per env** | Each environment has its own state file, preventing blast radius across environments |
 | **S3 backend with native lock** | Terraform 1.15+ supports `use_lockfile = true` — no DynamoDB needed |
-| **AWS Provider ~> 5.0** | Latest stable major version with broad feature support |
+| **AWS Provider ~> 5.100.0** | Pinned to a minor version; only patch updates allowed for reproducibility |
 | **Python 3.12 Lambda** | Simple, no build step required, fast cold starts |
 | **HTTP API Gateway (v2)** | Lower cost and latency than REST API for simple use cases |
 
